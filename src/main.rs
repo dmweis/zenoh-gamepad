@@ -1,6 +1,7 @@
 use chrono::prelude::{DateTime, Utc};
 use clap::Parser;
 use gilrs::GilrsBuilder;
+use schemars::{schema_for, JsonSchema};
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, HashMap};
 use std::hash::Hash;
@@ -68,6 +69,12 @@ async fn main() -> anyhow::Result<()> {
         .res()
         .await
         .map_err(HopperRemoteError::ZenohError)?;
+
+    let schema = schema_for!(InputMessage);
+    info!(
+        "Message schema:\n{}",
+        serde_json::to_string(&schema).unwrap()
+    );
 
     info!("Starting gamepad reader");
 
@@ -155,13 +162,13 @@ async fn main() -> anyhow::Result<()> {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize, Serialize, JsonSchema)]
 pub struct InputMessage {
     gamepads: HashMap<usize, GamepadMessage>,
     time: DateTime<Utc>,
 }
 
-#[derive(Debug, Deserialize, Serialize, Default)]
+#[derive(Debug, Deserialize, Serialize, Default, JsonSchema)]
 pub struct GamepadMessage {
     name: String,
     button_down_event_counter: BTreeMap<Button, usize>,
@@ -174,7 +181,9 @@ pub struct GamepadMessage {
 
 impl GamepadMessage {}
 
-#[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Hash, PartialOrd, Ord, Clone, Copy)]
+#[derive(
+    Debug, Deserialize, Serialize, PartialEq, Eq, Hash, PartialOrd, Ord, Clone, Copy, JsonSchema,
+)]
 pub enum Button {
     South,
     East,
@@ -251,7 +260,9 @@ impl From<gilrs::ev::Button> for Button {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize, PartialEq, Eq, Hash, PartialOrd, Ord, Clone, Copy)]
+#[derive(
+    Debug, Deserialize, Serialize, PartialEq, Eq, Hash, PartialOrd, Ord, Clone, Copy, JsonSchema,
+)]
 pub enum Axis {
     LeftStickX,
     LeftStickY,

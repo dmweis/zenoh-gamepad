@@ -1,26 +1,26 @@
 [package]
-name = "hopper-remote"
-version = "0.1.0"
-edition = "2021"
 authors = ["David Weis <davidmichaelweis@gmail.com>"]
 description = "Hopper hexapod robot"
+edition = "2021"
 license = "MIT OR APACHE"
+name = "hopper-remote"
 publish = false
 readme = "README.md"
 repository = "https://github.com/dmweis/hopper-remote"
+version = "0.1.0"
 
 [dependencies]
+anyhow = {version = "1.0", features = ["backtrace"]}
+chrono = {version = "0.4", features = ["serde"]}
+clap = {version = "4", features = ["derive"]}
+gilrs = {version = "0.10", features = ["xinput", "serde-serialize"], default-features = false}
+thiserror = "1.0"
 tokio = {version = "1.6", features = [
   "macros",
   "rt-multi-thread",
   "time",
   "process",
 ]}
-gilrs = { version = "0.10", features = ["xinput", "serde-serialize"], default-features = false }
-anyhow = { version = "1.0", features = ["backtrace"] }
-clap = {version = "4", features = ["derive"]}
-thiserror = "1.0"
-chrono = {version = "0.4", features = ["serde"]}
 
 # logging
 tracing = {version = "0.1", features = ["log"]}
@@ -31,6 +31,7 @@ tracing-subscriber = {version = "0.3", features = [
 ]}
 
 # serialization
+schemars = {version = "0.8.12", features = ["chrono"]}
 serde = {version = "1.0", features = ["derive"]}
 serde_json = "1.0"
 toml = "0.7.6"
