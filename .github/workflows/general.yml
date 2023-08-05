@@ -10,6 +10,8 @@ jobs:
     name: Test
     runs-on: ubuntu-20.04
     steps:
+      - name: Install libudev
+        run: sudo apt-get install librust-libudev-sys-dev -y
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
@@ -40,6 +42,8 @@ jobs:
     name: Clippy
     runs-on: ubuntu-20.04
     steps:
+      - name: Install libudev
+        run: sudo apt-get install librust-libudev-sys-dev -y
       - uses: actions/checkout@v2
       - uses: actions-rs/toolchain@v1
         with:
