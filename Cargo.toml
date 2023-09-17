@@ -9,11 +9,15 @@ readme = "README.md"
 repository = "https://github.com/dmweis/hopper-remote"
 version = "0.1.0"
 
+[features]
+default = ["gilrs/wgi"]
+xinput = ["gilrs/xinput"]
+
 [dependencies]
 anyhow = {version = "1.0", features = ["backtrace"]}
 chrono = {version = "0.4", features = ["serde"]}
 clap = {version = "4", features = ["derive"]}
-gilrs = {version = "0.10", features = ["xinput", "serde-serialize"], default-features = false}
+gilrs = {version = "0.10", features = ["serde-serialize"], default-features = false}
 thiserror = "1.0"
 tokio = {version = "1.6", features = [
   "macros",

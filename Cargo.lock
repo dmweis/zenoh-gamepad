@@ -867,6 +867,7 @@ dependencies = [
  "wasm-bindgen",
  "web-sys",
  "winapi",
+ "windows",
 ]
 
 [[package]]

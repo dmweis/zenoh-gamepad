@@ -131,8 +131,11 @@ async fn main() -> anyhow::Result<()> {
             }
         }
 
-        if let Some((gamepad_id, gamepad)) = gilrs.gamepads().next() {
+        let mut known_ids = vec![];
+
+        for (gamepad_id, gamepad) in gilrs.gamepads() {
             let gamepad_id: usize = gamepad_id.into();
+            known_ids.push(gamepad_id);
             let gamepad_data = message_data.gamepads.entry(gamepad_id).or_default();
 
             gamepad_data.connected = gamepad.is_connected();
@@ -150,6 +153,11 @@ async fn main() -> anyhow::Result<()> {
                 // let x = if x.abs() > 0.2 { x } else { 0.0 };
             }
         }
+
+        // remove gamepads that are no longer connected
+        message_data
+            .gamepads
+            .retain(|gamepad_id, _| known_ids.contains(gamepad_id));
 
         message_data.time = std::time::SystemTime::now().into();
         let json = serde_json::to_string(&message_data)?;
