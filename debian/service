@@ -1,0 +1,16 @@
+[Unit]
+Description=hopper-remote
+After=network-online.target nss-lookup.target
+Wants=network-online.target
+
+[Service]
+User=hopper-remote
+DynamicUser=yes
+SupplementaryGroups=input
+Type=simple
+Restart=on-failure
+RestartSec=5s
+ExecStart=/usr/bin/hopper-remote
+
+[Install]
+WantedBy=default.target

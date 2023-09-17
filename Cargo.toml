@@ -9,6 +9,19 @@ readme = "README.md"
 repository = "https://github.com/dmweis/hopper-remote"
 version = "0.1.0"
 
+[package.metadata.deb]
+assets = [
+  [
+    "target/release/hopper-remote",
+    "/usr/bin/",
+    "755",
+  ],
+]
+maintainer = "David Weis <dweis7@gmail.com>"
+maintainer-scripts = "debian/"
+
+[package.metadata.deb.systemd-units]
+
 [features]
 default = ["gilrs/wgi"]
 xinput = ["gilrs/xinput"]
@@ -19,12 +32,7 @@ chrono = {version = "0.4", features = ["serde"]}
 clap = {version = "4", features = ["derive"]}
 gilrs = {version = "0.10", features = ["serde-serialize"], default-features = false}
 thiserror = "1.0"
-tokio = {version = "1.6", features = [
-  "macros",
-  "rt-multi-thread",
-  "time",
-  "process",
-]}
+tokio = {version = "1", features = ["full"]}
 
 # logging
 tracing = {version = "0.1", features = ["log"]}
@@ -38,7 +46,6 @@ tracing-subscriber = {version = "0.3", features = [
 schemars = {version = "0.8.12", features = ["chrono"]}
 serde = {version = "1.0", features = ["derive"]}
 serde_json = "1.0"
-toml = "0.7.6"
 
 # zenoh
 zenoh = "0.7.2-rc"
