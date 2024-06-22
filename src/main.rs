@@ -4,6 +4,7 @@ use anyhow::Context;
 use clap::Parser;
 use std::{
     collections::HashMap,
+    str::FromStr,
     sync::{
         atomic::{AtomicBool, Ordering},
         Arc,
@@ -70,7 +71,7 @@ async fn main() -> anyhow::Result<()> {
     setup_tracing(args.verbose);
 
     let mut zenoh_config = if let Some(conf_file) = &args.config {
-        Config::from_file(conf_file).unwrap()
+        Config::from_file(conf_file).map_err(ErrorWrapper::ZenohError)?
     } else {
         Config::default()
     };
@@ -100,17 +101,19 @@ async fn main() -> anyhow::Result<()> {
         .map_err(ErrorWrapper::ZenohError)?
         .into_arc();
 
-    let gamepad_publisher = zenoh_session
-        .declare_publisher(args.topic)
-        .res()
-        .await
-        .map_err(ErrorWrapper::ZenohError)?;
-
     let schema = schema_for!(InputMessage);
     info!(
         "Message schema:\n{}",
         serde_json::to_string_pretty(&schema)?
     );
+
+    start_schema_queryable(zenoh_session.clone(), &args.topic).await?;
+
+    let gamepad_publisher = zenoh_session
+        .declare_publisher(args.topic)
+        .res()
+        .await
+        .map_err(ErrorWrapper::ZenohError)?;
 
     info!("Starting gamepad reader");
 
@@ -215,6 +218,33 @@ async fn main() -> anyhow::Result<()> {
             .map_err(ErrorWrapper::ZenohError)?;
         tokio::time::sleep_until(loop_start + Duration::from_millis(args.sleep_ms)).await;
     }
+
+    Ok(())
+}
+
+async fn start_schema_queryable(
+    zenoh_session: Arc<Session>,
+    pub_topic: &str,
+) -> anyhow::Result<()> {
+    let schema_topic = format!("{}/__schema__", pub_topic);
+
+    let queryable = zenoh_session
+        .declare_queryable(&schema_topic)
+        .res()
+        .await
+        .map_err(ErrorWrapper::ZenohError)?;
+
+    tokio::spawn(async move {
+        while let Ok(query) = queryable.recv_async().await {
+            let schema = schema_for!(InputMessage);
+            if let Ok(schema) = serde_json::to_string(&schema) {
+                if let Ok(key_expr) = KeyExpr::<'static>::from_str(&schema_topic) {
+                    let reply = Ok(Sample::new(key_expr, schema));
+                    _ = query.reply(reply).res().await;
+                }
+            }
+        }
+    });
 
     Ok(())
 }
