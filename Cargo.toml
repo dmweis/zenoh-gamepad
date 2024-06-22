@@ -7,7 +7,7 @@ name = "zenoh-gamepad"
 publish = false
 readme = "README.md"
 repository = "https://github.com/dmweis/zenoh-gamepad"
-version = "0.1.0"
+version = "0.2.0"
 
 [package.metadata.deb]
 assets = [
