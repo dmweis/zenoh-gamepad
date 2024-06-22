@@ -11,7 +11,6 @@ use tracing::*;
 use zenoh::config::Config;
 use zenoh::prelude::r#async::*;
 
-/// Visualize Hopper
 #[derive(Parser)]
 #[command(author, version)]
 struct Args {
@@ -48,10 +47,10 @@ async fn main() -> anyhow::Result<()> {
     };
 
     if !args.connect.is_empty() {
-        zenoh_config.connect.endpoints = args.connect.clone();
+        zenoh_config.connect.endpoints.clone_from(&args.connect);
     }
     if !args.listen.is_empty() {
-        zenoh_config.listen.endpoints = args.listen.clone();
+        zenoh_config.listen.endpoints.clone_from(&args.listen);
     }
     info!("Using config {:?}", args.config);
     info!("Connecting to {:?}", zenoh_config.connect.endpoints);
@@ -61,19 +60,19 @@ async fn main() -> anyhow::Result<()> {
     let zenoh_session = zenoh::open(zenoh_config)
         .res()
         .await
-        .map_err(HopperRemoteError::ZenohError)?
+        .map_err(ErrorWrapper::ZenohError)?
         .into_arc();
 
     let gamepad_publisher = zenoh_session
         .declare_publisher(args.topic)
         .res()
         .await
-        .map_err(HopperRemoteError::ZenohError)?;
+        .map_err(ErrorWrapper::ZenohError)?;
 
     let schema = schema_for!(InputMessage);
     info!(
         "Message schema:\n{}",
-        serde_json::to_string(&schema).unwrap()
+        serde_json::to_string_pretty(&schema).unwrap()
     );
 
     info!("Starting gamepad reader");
@@ -165,7 +164,7 @@ async fn main() -> anyhow::Result<()> {
             .put(json)
             .res()
             .await
-            .map_err(HopperRemoteError::ZenohError)?;
+            .map_err(ErrorWrapper::ZenohError)?;
         tokio::time::sleep(Duration::from_millis(args.sleep_ms)).await;
     }
 }
@@ -327,7 +326,7 @@ pub fn setup_tracing(verbosity_level: u8) {
 }
 
 #[derive(Error, Debug)]
-pub enum HopperRemoteError {
+pub enum ErrorWrapper {
     #[error("Zenoh error {0:?}")]
     ZenohError(#[from] zenoh::Error),
 }

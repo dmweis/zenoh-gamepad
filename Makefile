@@ -1,4 +1,4 @@
-DEB_BUILD_PATH ?= target/debian/hopper-remote_*.deb
+DEB_BUILD_PATH ?= target/debian/zenoh-gamepad_*.deb
 
 
 .PHONY: build

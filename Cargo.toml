@@ -1,18 +1,18 @@
 [package]
 authors = ["David Weis <davidmichaelweis@gmail.com>"]
-description = "Hopper hexapod robot"
+description = "Publish gamepad messages over zenoh"
 edition = "2021"
 license = "MIT OR APACHE"
-name = "hopper-remote"
+name = "zenoh-gamepad"
 publish = false
 readme = "README.md"
-repository = "https://github.com/dmweis/hopper-remote"
+repository = "https://github.com/dmweis/zenoh-gamepad"
 version = "0.1.0"
 
 [package.metadata.deb]
 assets = [
   [
-    "target/release/hopper-remote",
+    "target/release/zenoh-gamepad",
     "/usr/bin/",
     "755",
   ],
@@ -22,15 +22,11 @@ maintainer-scripts = "debian/"
 
 [package.metadata.deb.systemd-units]
 
-[features]
-default = ["gilrs/wgi"]
-xinput = ["gilrs/xinput"]
 
 [dependencies]
 anyhow = {version = "1.0", features = ["backtrace"]}
 chrono = {version = "0.4", features = ["serde"]}
 clap = {version = "4", features = ["derive"]}
-gilrs = {version = "0.10", features = ["serde-serialize"], default-features = false}
 thiserror = "1.0"
 tokio = {version = "1", features = ["full"]}
 
@@ -48,5 +44,14 @@ serde = {version = "1.0", features = ["derive"]}
 serde_json = "1.0"
 
 # zenoh
-zenoh = "0.7.2-rc"
-zenoh-config = "0.7.2-rc"
+zenoh = "0.11.0"
+zenoh-config = "0.11.0"
+
+
+# Windows xinput
+[target.'cfg(windows)'.dependencies]
+gilrs = {version = "0.10", features = ["serde-serialize", "xinput"], default-features = false}
+
+# Linux wgi
+[target.'cfg(not(windows))'.dependencies]
+gilrs = {version = "0.10", features = ["serde-serialize", "wgi"], default-features = false}

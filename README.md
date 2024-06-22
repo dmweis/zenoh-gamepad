@@ -1,6 +1,6 @@
-# Hopper remote
+# Zenoh Gamepad
 
-[![Rust](https://github.com/dmweis/hopper-remote/workflows/Rust/badge.svg)](https://github.com/dmweis/hopper-remote/actions)
+[![Rust](https://github.com/dmweis/zenoh-gamepad/workflows/Rust/badge.svg)](https://github.com/dmweis/zenoh-gamepad/actions)
 
 Simple remote control node that publishes gamepad commands over zenoh
 
